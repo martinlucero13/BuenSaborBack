@@ -1,13 +1,13 @@
-package com.example.instrumentos;
+package main;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class InstrumentosApplication {
+public class mainApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InstrumentosApplication.class, args);
+		SpringApplication.run(mainApplication.class, args);
 	}
 
 }
