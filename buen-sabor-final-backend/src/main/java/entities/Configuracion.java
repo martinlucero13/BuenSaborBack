@@ -4,22 +4,51 @@
  */
 package entities;
 
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  *
  * @author Usuario
  */
-public class Configuracion {
+@Entity
+@Table(name = "configuracion")
+public class Configuracion implements Serializable{
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int idConfiguracion;
+    
+    @Column(name = "cantidadCocineros")
     private int cantidadCocineros;
+    
+    @Column(name = "emailEmpresa")
     private String emailEmpresa;
+    
+    @Column(name = "tokenMercadoPago")
     private String tokenMercadoPago;
 
-    public Configuracion(int cantidadCocineros, String emailEmpresa, String tokenMercadoPago) {
+    public Configuracion(int idConfiguracion, int cantidadCocineros, String emailEmpresa, String tokenMercadoPago) {
+        this.idConfiguracion = idConfiguracion;
         this.cantidadCocineros = cantidadCocineros;
         this.emailEmpresa = emailEmpresa;
         this.tokenMercadoPago = tokenMercadoPago;
     }
 
     public Configuracion() {
+    }
+
+    public int getId() {
+        return idConfiguracion;
+    }
+
+    public void setId(int idConfiguracion) {
+        this.idConfiguracion = idConfiguracion;
     }
 
     public int getCantidadCocineros() {
@@ -45,5 +74,6 @@ public class Configuracion {
     public void setTokenMercadoPago(String tokenMercadoPago) {
         this.tokenMercadoPago = tokenMercadoPago;
     }
+    
     
 }

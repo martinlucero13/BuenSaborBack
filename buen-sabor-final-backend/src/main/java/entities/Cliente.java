@@ -11,6 +11,7 @@ import java.util.List;
  * @author Usuario
  */
 public class Cliente {
+    private String idClienten;
     private String nombre;
     private String apellido;
     private long telefono;
@@ -30,6 +31,14 @@ public class Cliente {
     }
 
     public Cliente() {
+    }
+
+    public String getIdClienten() {
+        return idClienten;
+    }
+
+    public void setIdClienten(String idClienten) {
+        this.idClienten = idClienten;
     }
 
     public String getNombre() {

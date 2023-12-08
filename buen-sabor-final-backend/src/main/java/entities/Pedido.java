@@ -1,27 +1,55 @@
 
 package entities;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
-
-public class Pedido {
+@Entity
+@Table(name = "pedido")
+public class Pedido implements Serializable{
+    private static final long serialVersionUID = 1L;
+    
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idPedido;
+    
+    @Column(name = "fecha")
     private Date fecha;
+    @Column(name = "numero")
     private int numero;
-    //DateTime
-    private Date horaEstimadaFin;
+    //DateTime    
+    @Column(name = "horaEstimadaFin")
+    private int horaEstimadaFin;
+    
+    @Column(name = "tipoEnvio")
     private int tipoEnvio;
+    
+    @Column(name = "total")
     private double total;
+    
     private Factura factura;
     private List<DetallePedido>detallesFactura;
     private Cliente cliente;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_mercadoPagoDatos")
     private MercadoPagoDatos mercadoPagoDatos;
 
     public Pedido() {
     }
 
-    public Pedido(int idPedido, Date fecha, int numero, Date horaEstimadaFin, int tipoEnvio, double total, Factura factura, List<DetallePedido> detallesFactura, Cliente cliente, MercadoPagoDatos mercadoPagoDatos) {
+    public Pedido(int idPedido, Date fecha, int numero, int horaEstimadaFin, int tipoEnvio, double total, Factura factura, List<DetallePedido> detallesFactura, Cliente cliente, MercadoPagoDatos mercadoPagoDatos) {
         this.idPedido = idPedido;
         this.fecha = fecha;
         this.numero = numero;
@@ -58,11 +86,11 @@ public class Pedido {
         this.numero = numero;
     }
 
-    public Date getHoraEstimadaFin() {
+    public int getHoraEstimadaFin() {
         return horaEstimadaFin;
     }
 
-    public void setHoraEstimadaFin(Date horaEstimadaFin) {
+    public void setHoraEstimadaFin(int horaEstimadaFin) {
         this.horaEstimadaFin = horaEstimadaFin;
     }
 

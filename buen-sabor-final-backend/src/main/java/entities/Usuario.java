@@ -9,6 +9,7 @@ package entities;
  * @author Usuario
  */
 public class Usuario {
+    private int idUsuario;
     private String usuario;
     private String clave;
     private String rol;
@@ -22,6 +23,14 @@ public class Usuario {
     }
 
     public Usuario() {
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getUsuario() {

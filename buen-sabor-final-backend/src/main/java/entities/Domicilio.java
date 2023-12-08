@@ -9,6 +9,7 @@ package entities;
  * @author Usuario
  */
 public class Domicilio {
+    private int idDomicilio;
     private String calle;
     private int numero;
     private String localidad;
@@ -24,6 +25,14 @@ public class Domicilio {
     }
 
     public Domicilio() {
+    }
+
+    public int getIdDomicilio() {
+        return idDomicilio;
+    }
+
+    public void setIdDomicilio(int idDomicilio) {
+        this.idDomicilio = idDomicilio;
     }
 
     public String getCalle() {

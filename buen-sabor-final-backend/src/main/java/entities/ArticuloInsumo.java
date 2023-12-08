@@ -4,20 +4,47 @@
  */
 package entities;
 
+import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  *
  * @author Lopez
  */
-public class ArticuloInsumo {
+@Entity
+@Table(name = "ArticuloInsumo")
+public class ArticuloInsumo implements Serializable{ 
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idArticuloInsumo;
+    
+    @Column(name = "denominacion")
     private String denominacion;
+    
+    @Column(name = "precioCompra")
     private double precioCompra;
+    
+    @Column(name = "precioVenta")
     private double precioVenta;
+    
+    @Column(name = "stockActual")
     private double stockActual;
+    
+    @Column(name = "stockMinimo")
     private double stockMinimo;
+    
+    @Column(name = "unidadMedida")
     private String unidadMedida;
+    
+    @Column(name = "esInsumo")
     private boolean esInsumo;
     private List<DetallePedido> detallesPedido;
     private List<DetalleFactura> detallesFactura;
