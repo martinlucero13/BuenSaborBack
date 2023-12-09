@@ -1,32 +1,34 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.example.buensabor.entities;
 
-package entities;
 
-public class DetalleFactura {
-    private int idDetalleFactura;
+public class DetallePedido {
+    private int idDetallePedido;
     private int cantidad;
     private double subtotal;
-    private Factura factura;
     private ArticuloInsumo articuloInsumo;
     private ArticuloManufacturado articuloManufacturado;
 
-    public DetalleFactura() {
+    public DetallePedido() {
     }
 
-    public DetalleFactura(int idDetalleFactura, int cantidad, double subtotal, Factura factura, ArticuloInsumo articuloInsumo, ArticuloManufacturado articuloManufacturado) {
-        this.idDetalleFactura = idDetalleFactura;
+    public DetallePedido(int idDetallePedido, int cantidad, double subtotal, ArticuloInsumo articuloInsumo, ArticuloManufacturado articuloManufacturado) {
+        this.idDetallePedido = idDetallePedido;
         this.cantidad = cantidad;
         this.subtotal = subtotal;
-        this.factura = factura;
         this.articuloInsumo = articuloInsumo;
         this.articuloManufacturado = articuloManufacturado;
     }
 
-    public int getIdDetalleFactura() {
-        return idDetalleFactura;
+    public int getIdDetallePedido() {
+        return idDetallePedido;
     }
 
-    public void setIdDetalleFactura(int idDetalleFactura) {
-        this.idDetalleFactura = idDetalleFactura;
+    public void setIdDetallePedido(int idDetallePedido) {
+        this.idDetallePedido = idDetallePedido;
     }
 
     public int getCantidad() {
@@ -43,14 +45,6 @@ public class DetalleFactura {
 
     public void setSubtotal(double subtotal) {
         this.subtotal = subtotal;
-    }
-
-    public Factura getFactura() {
-        return factura;
-    }
-
-    public void setFactura(Factura factura) {
-        this.factura = factura;
     }
 
     public ArticuloInsumo getArticuloInsumo() {

@@ -4,7 +4,7 @@
  */
 package com.example.instrumentos.controllers;
 
-import com.example.instrumentos.entities.Instrumento;
+import com.example.buensabor.entities.Instrumento;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

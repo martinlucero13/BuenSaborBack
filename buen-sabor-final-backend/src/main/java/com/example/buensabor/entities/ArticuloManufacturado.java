@@ -1,5 +1,5 @@
 
-package entities;
+package com.example.buensabor.entities;
 
 import java.util.List;
 
