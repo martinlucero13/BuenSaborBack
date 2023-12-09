@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.example.instrumentos.controllers;
+package com.example.instrumentos.services;
 
+import com.example.instrumentos.controllers.*;
 import com.example.buensabor.entities.Instrumento;
-import com.example.instrumentos.services.InstrumentosServices;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,28 +23,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author Usuario
- */
-//clase que recive las peticiones del cliente y va a responder 
-//Es para que no tenga conflico con el origin 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-//Le dice a la api que esta clase va a recivir peticiones
-@RestController
-@RequestMapping("/instrumentos")
-public class InstrumentosController {
+
+public class InstrumentosServices {
+    public InstrumentosServices() {
+    }
     
-    InstrumentosServices insServices = new InstrumentosServices();
-    //El value es el valor que yo voy a tener que poner en el browser, estas dos primeras anotaciones hacen lo mismo
-    @RequestMapping(value = "prueba")
     public String prueba(){
-        return insServices.prueba();
+        return "PRUEBA SPRING BOOT Vaaaaamooo Manao";
     } 
     //lo que se informa es de tipo get y trae la ruta
-    @GetMapping("prueba2")
+
+    
+
     public String prueba2(){
-        return insServices.prueba2();
+        return "PRUEBA 2 SPRING BOOT";
     } 
     
     String urlConexion = "jdbc:mysql://localhost:3306/InstrumentosDB";
