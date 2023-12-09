@@ -4,48 +4,31 @@
  */
 package entities;
 
-import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+
 
 /**
  *
  * @author Usuario
  */
-@Entity
-@Table(name = "MercadoPagoDatos")
-public class MercadoPagoDatos implements Serializable{
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+public class MercadoPagoDatos{
+
     private int idMercadoPagoDatos;
-    
-    @Column(name = "fechaCreacion")
+
     private Date fechaCreacion;
-    
-    @Column(name = "fechaAprobacion")
+
     private Date fechaAprobacion;
-    
-    @Column(name = "formaPago")
+
     private String formaPago;
-    
-    @Column(name = "metodoPago")
+
     private String metodoPago;
-    
-    @Column(name = "nroTarjeta")
+
     private String nroTarjeta;
-    
-    @Column(name = "estado")
+
     private String estado;
     
-    @OneToOne(mappedBy = "mercadoPagoDatos")
+
     private Pedido pedido;
 
     public MercadoPagoDatos(int idMercadoPagoDatos, Date fechaCreacion, Date fechaAprobacion, String formaPago, String metodoPago, String nroTarjeta, String estado, Pedido pedido) {
