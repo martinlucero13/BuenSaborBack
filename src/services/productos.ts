@@ -252,4 +252,94 @@ export default class ProductosService {
     const data = await this.conectionLegacy.query(query);
     return data
   }
+
+  async tomarPedidoCocina() {
+    //agrege col pagado 0 No 1 SI
+    //Agregar en la consulta de pedido y de cajero
+    //console.log(dateDesde, dateHasta)
+    //--INNER JOIN Factura b ON a.idPedido = b.idFactura
+    //--INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
+    //--INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
+
+    const query = 
+    `SELECT a.idPedido, a.fecha, a.horaEstimadaFin, a.estado
+    FROM Pedido a
+    WHERE a.estado < 2
+    ORDER BY a.idPedido DESC`
+    const data = await this.conectionLegacy.query(query)
+    //console.log(data)
+    return data
+  }
+
+  async tomarDetallePedidoCocina(idPedido: string) {
+    const query = 
+    `SELECT *
+    FROM DetallePedido a
+    INNER JOIN ArticuloManufacturado b on a.idArticuloManufacturado = b.idArticuloManufacturado
+    WHERE idPedido = ${idPedido}`
+    const data = await this.conectionLegacy.query(query)
+    //console.log(data)
+    return data
+  }
+
+  async tomarIngredientesPedido(idArticuloManufacturado: string) {
+    const query = 
+    `SELECT a.cantidad, b.denominacion, b.unidadMedida
+    FROM CantidadIngredientes a
+    INNER JOIN ArticuloInsumo b ON a.idArticuloInsumo = b.idArticuloInsumo
+    WHERE a.idArticuloManufac = ${idArticuloManufacturado}`
+    const data = await this.conectionLegacy.query(query)
+    //console.log(data)
+    return data
+  }
+
+  async agregarTiempo(idPedido: string, horaEstimadaFin: string) {
+    let hora_str = horaEstimadaFin;
+    let horas = parseInt(hora_str.substr(0, 2));
+    let minutos = parseInt(hora_str.substr(3, 2));
+    let segundos = parseInt(hora_str.substr(6, 2));
+    //console.log(horas,minutos,segundos)
+    horaEstimadaFin = this.sumarMinutosAHora(horas,minutos,segundos,10);
+    //console.log(idPedido, horaEstimadaFin)
+    const query = 
+    `UPDATE Pedido SET horaEstimadaFin = '${horaEstimadaFin}' WHERE idPedido = ${idPedido}`
+    const data = await this.conectionLegacy.query(query)
+    return data
+  }
+
+  async cambiarEstado(idPedido: string, estado: number) {
+    //Quiero hacer un condicional en el que si el estado despues de ser sumado es 1 se haga el update 
+    //Pero si el estado es 2 es decir que va a ser finalizado se reste el stock de ingredientes 
+    let est = estado + 1;
+
+    if(est == 2){
+      this.restaStokIngrediente(idPedido);
+    }
+    const query = 
+    `UPDATE Pedido SET estado = ${est} WHERE idPedido = ${idPedido}`
+    const data = await this.conectionLegacy.query(query)
+    return data
+  }
+
+  async restaStokIngrediente(idPedido: string) {
+    const query = 
+    `SELECT b.cantidad AS cantArti, d.cantidad AS cantIngre, d.idArticuloInsumo, (b.cantidad * d.cantidad) AS totResta
+    FROM Pedido a
+    INNER JOIN DetallePedido b ON a.idPedido = b.idPedido
+    INNER JOIN ArticuloManufacturado c ON b.idArticuloManufacturado = c.idArticuloManufacturado
+    INNER JOIN CantidadIngredientes d ON c.idArticuloManufacturado = d.idArticuloManufac
+    WHERE a.idPedido = ${idPedido}`
+    const data = await this.conectionLegacy.query(query);
+
+    for(let i=0; i<data.length; i++){
+      const queryStock = `SELECT stockActual FROM ArticuloInsumo WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`
+      const dataStock = await this.conectionLegacy.query(queryStock);
+      let stockActual = dataStock[0].stockActual;
+      let totalARestar = data[i].totResta;
+      let nuevoStock = stockActual - totalARestar;
+
+      const queryNuevoStock = `UPDATE ArticuloInsumo SET stockActual = ${nuevoStock} WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`
+      const dataNuevoStock = await this.conectionLegacy.query(queryNuevoStock);
+    }   
+  }
 }

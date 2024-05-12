@@ -64,4 +64,39 @@ export class ProductosController {
   async pedidoEntregado(@QueryParam("idPedido", { required: true }) idPedido: string) {
       return this.service.pedidoEntregado(idPedido)
   }
+
+  @Get("/tomarPedidoCocina")
+  async tomarPedidoCocina() {
+      return this.service.tomarPedidoCocina();
+  }
+
+  @Get("/tomarDetallePedidoCocina")
+  async tomarDetallePedidoCocina(
+    @QueryParam("idPedido", { required: true }) idPedido: string
+  ) {
+      return this.service.tomarDetallePedidoCocina(idPedido);
+  }
+
+  @Get("/tomarIngredientesPedido")
+  async tomarIngredientesPedido(
+    @QueryParam("idArticuloManufacturado", { required: true }) idArticuloManufacturado: string
+  ) {
+      return this.service.tomarIngredientesPedido(idArticuloManufacturado);
+  }
+
+  @Post("/agregarTiempo")
+  async agregarTiempo(
+    @QueryParam("idPedido", { required: true }) idPedido: string,
+    @QueryParam("horaEstimadaFin", { required: true }) horaEstimadaFin: string
+  ) {
+      return this.service.agregarTiempo(idPedido, horaEstimadaFin);
+  }
+
+  @Post("/cambiarEstado")
+  async cambiarEstado(
+    @QueryParam("idPedido", { required: true }) idPedido: string,
+    @QueryParam("estado", { required: true }) estado: number
+  ) {
+      return this.service.cambiarEstado(idPedido, estado);
+  }
 }
