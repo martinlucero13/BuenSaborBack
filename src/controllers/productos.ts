@@ -99,4 +99,12 @@ export class ProductosController {
   ) {
       return this.service.cambiarEstado(idPedido, estado);
   }
+
+  @Get("/tomarPedidoAdmin")
+  async tomarPedidoAdmin(
+    @QueryParam("dateDesde", { required: true }) dateDesde: string,
+    @QueryParam("dateHasta", { required: true }) dateHasta: string
+  ) {
+      return this.service.tomarPedidoAdmin(dateDesde, dateHasta);
+  }
 }

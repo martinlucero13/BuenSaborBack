@@ -7,6 +7,7 @@ import { RubroProductosController } from "./rubroProductos";
 import { StockIngredientesController } from "./stockIngredientes";
 import { StockProductosController } from "./stockProductos";
 import { ProductosController } from "./productos";
+import { EstadisticasController } from "./estadisticas";
 
 export const controllers = [
   UsersColController,
@@ -17,5 +18,6 @@ export const controllers = [
   RubroProductosController,
   StockIngredientesController,
   StockProductosController,
-  ProductosController
+  ProductosController,
+  EstadisticasController
 ];

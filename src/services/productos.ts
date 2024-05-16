@@ -182,12 +182,14 @@ export default class ProductosService {
     //agrege col pagado 0 No 1 SI
     //Agregar en la consulta de pedido y de cajero
     const query = 
-    `SELECT *, b.numero AS nrofac
+    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto,
+    b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura
     INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
     INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
-    WHERE idCliente =  ${NROLEG}`
+    WHERE idCliente =  ${NROLEG}
+    `
     const data = await this.conectionLegacy.query(query)
     //console.log(data)
     return data
@@ -341,5 +343,22 @@ export default class ProductosService {
       const queryNuevoStock = `UPDATE ArticuloInsumo SET stockActual = ${nuevoStock} WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`
       const dataNuevoStock = await this.conectionLegacy.query(queryNuevoStock);
     }   
+  }
+
+  async tomarPedidoAdmin(dateDesde: string, dateHasta: string) {
+    console.log(dateDesde)
+    const query = 
+    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto,
+    b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 
+    FROM Pedido a
+    INNER JOIN Factura b ON a.idPedido = b.idFactura
+    INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
+    INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
+    WHERE a.fecha >= '${dateDesde}' AND a.fecha <= '${dateHasta}'
+    AND (a.estado = 2 OR a.estado = 4)`
+
+    const data = await this.conectionLegacy.query(query)
+    //console.log(data)
+    return data
   }
 }
