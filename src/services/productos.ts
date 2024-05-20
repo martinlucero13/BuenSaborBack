@@ -346,7 +346,6 @@ export default class ProductosService {
   }
 
   async tomarPedidoAdmin(dateDesde: string, dateHasta: string) {
-    console.log(dateDesde)
     const query = 
     `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto,
     b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 

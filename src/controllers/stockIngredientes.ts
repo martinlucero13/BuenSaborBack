@@ -33,4 +33,11 @@ export class StockIngredientesController {
   ) {
       return this.service.deleteStockIngredientes(idArticuloInsumo);
   }
+
+  @Post("/editStockActualIngredientes")
+  async editStockActualIngredientes(
+      @Body() formData: any
+  ) {
+      return this.service.editStockActualIngredientes(formData);
+  }
 }

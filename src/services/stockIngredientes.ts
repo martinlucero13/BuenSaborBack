@@ -36,12 +36,20 @@ export default class StockIngredientesService {
     stockMinimo = ${formData.stockMinimo}, unidadMedida = '${formData.unidadMedida}', esInsumo = ${formData.esInsumo}, idRubro = ${formData.rubro}
     WHERE idArticuloInsumo = ${formData.idData}`
     const dataCli = await this.conectionLegacy.query(updateCli);
-
+    return dataCli
   }
 
     async deleteStockIngredientes(idArticuloInsumo: number) {
     const queryDelete = `DELETE from ArticuloInsumo WHERE idArticuloInsumo = ${idArticuloInsumo}`
     const data = await this.conectionLegacy.query(queryDelete);
     return data
+  }
+
+  async editStockActualIngredientes(formData: any) {
+    const query = `UPDATE ArticuloInsumo SET
+    stockActual = ${formData.stockActual}
+    WHERE idArticuloInsumo = ${formData.idData}`
+    const dataCli = await this.conectionLegacy.query(query);
+    return dataCli
   }
 }
