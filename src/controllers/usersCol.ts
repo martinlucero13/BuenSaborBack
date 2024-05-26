@@ -24,4 +24,29 @@ export class UsersColController {
   ) {
     return this.service.resetPassword(legajo, dni)
   }
+
+  @Get("/validaUsuario")
+  async validaUsuario(@QueryParam("usuario") usuario: string) {
+    return this.service.validaUsuario(usuario)
+  }
+
+  @Post("/createUsuario")
+  async createUsuario(
+      @Body() formData: any
+  ) {
+      return this.service.createUsuario(formData);
+  }
+
+  @Get("/dataUser")
+  async dataUser(@QueryParam("usuario") usuario: string) {
+    return this.service.dataUser(usuario)
+  }
+
+  @Get("/resetClave")
+  async resetClave(
+    @QueryParam("usuario") usuario: string,
+    @QueryParam("telefono") telefono: number
+  ) {
+    return this.service.resetClave(usuario, telefono)
+  }
 }
