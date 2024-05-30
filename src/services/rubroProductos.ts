@@ -1,4 +1,6 @@
 import { getDBConnection, DatabasesEnum } from "../database/connectionManager"
+import fs from 'fs';
+import path from 'path';
 
 export default class RubroProductosService {
   private conectionLegacy
@@ -52,5 +54,29 @@ export default class RubroProductosService {
     WHERE rubro = 2 AND subrubro != 0 AND habilitado = 1`
     const data = await this.conectionLegacy.query(query)
     return data
+  }
+
+  async saveImg(userData: any) {
+    const directory = 'C:/Users/lucerom/Documents/ProyectoFinal/GitHub/BuenSaborFront/public'
+    const fileName = userData.denominacion + '.jpg';
+    // Asegúrate de que el directorio existe, si no, créalo.
+    if (!fs.existsSync(directory)){
+      fs.mkdirSync(directory, { recursive: true });
+    }
+    
+    // Decodifica la imagen Base64.
+    const base64Image = userData.dataImage.split(';base64,').pop();
+
+    // Especifica la ruta completa del archivo.
+    const filePath = path.join(directory, fileName);
+
+    // Escribe el archivo.
+    fs.writeFile(filePath, base64Image, {encoding: 'base64'}, (err) => {
+        if (err) {
+            console.error('Error al guardar la imagen:', err);
+        } else {
+            console.log('Imagen guardada correctamente en:', filePath);
+        }
+    });
   }
 }

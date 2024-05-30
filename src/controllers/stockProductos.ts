@@ -64,4 +64,9 @@ export class StockProductosController {
   ) {
       return this.service.deleteIngredienteProductos(idCantIngredint);
   }
+
+  @Post("/saveImg")
+  async saveImg(@Body() userData: any) {
+    return this.service.saveImg(userData)
+  }
 }

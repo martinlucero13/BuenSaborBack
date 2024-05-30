@@ -38,4 +38,9 @@ export class RubroProductosController {
   async getRubroProductosMenu() {
     return this.service.getRubroProductosMenu()
   }
+
+  @Post("/saveImg")
+  async saveImg(@Body() userData: any) {
+    return this.service.saveImg(userData)
+  }
 }
