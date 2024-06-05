@@ -96,6 +96,70 @@ export default class UsersColService {
     return insertUsu
   }
 
+  async createUsuarioGoogle(email: string, name: string, picture: string) {
+    //console.log(email, name, picture) 
+    //Tengo que chequear que no existe ese usuario, si no exite hago el insert sino no hago nada 
+    //para crear el nombre de usuario tengo que separar el mail hasta el @
+    const nombreUsuario = this.obtenerParteAntesDelArroba(email);
+    let existe:any = await this.validaUsuario(nombreUsuario)
+    if(existe[0].cantUsu == 0){
+      const { nombres: nombres1, apellidos: apellidos1 } = this.separarNombreApellido(name); 
+      const queryUlti = `SELECT MAX(idUsuario) AS ultimoid FROM usuario`
+      //clientes'1'
+      const data = await this.conectionLegacy.query(queryUlti);
+      let ultimo = 0;
+      ultimo = data[0].ultimoid;
+      ultimo++
+
+      let nom = nombres1.toUpperCase();
+      let ape = apellidos1.toUpperCase();
+
+      //Hacer insert en usuario Cliente Domicilio
+      const insertUsu = `INSERT INTO usuario (idUsuario, usuario, clave, rol, marca1) 
+      VALUES(${ultimo}, '${nombreUsuario}', '1234', '1', '1')`
+      const dataUsu = await this.conectionLegacy.query(insertUsu);
+
+      const insertCli = `INSERT INTO cliente (idCliente, nombre, apellido, telefono, email) 
+      VALUES(${ultimo}, '${nom}', '${ape}', 0, '${email}')`
+      const dataCli = await this.conectionLegacy.query(insertCli);
+
+      const insertDom = `INSERT INTO Domicilio(idDomicilio, calle, numero, localidad)
+      VALUES(${ultimo}, '', '', '')`
+      const dataDom = await this.conectionLegacy.query(insertDom);
+      
+      return insertUsu
+    }
+  }
+
+  obtenerParteAntesDelArroba(email: string): string {
+    const partes = email.split('@');
+    return partes[0];
+  }
+
+  separarNombreApellido(nombreCompleto:string) {
+    const partes = nombreCompleto.trim().split(/\s+/);
+
+    if (partes.length === 1) {
+        return { nombres: partes[0], apellidos: "" };
+    } else if (partes.length === 2) {
+        return { nombres: partes[0], apellidos: partes[1] };
+    } else if (partes.length === 3) {
+        return { nombres: partes[0] + " " + partes[1], apellidos: partes[2] };
+    } else {
+        const apellidos = partes.slice(-2).join(" ");
+        const nombres = partes.slice(0, -2).join(" ");
+        return { nombres, apellidos };
+    }
+}
+
+  async takePassword(email: string) {
+    const nombreUsuario = this.obtenerParteAntesDelArroba(email);
+    const query = `SELECT clave FROM Usuario WHERE usuario = '${nombreUsuario}'`
+
+    const data = await this.conectionLegacy.query(query)
+    return data
+  }
+
   async dataUser(usuario: string) {
     const query = `SELECT a.usuario, b.email, b.telefono
       FROM Usuario a 

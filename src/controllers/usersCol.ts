@@ -37,6 +37,20 @@ export class UsersColController {
       return this.service.createUsuario(formData);
   }
 
+  @Post("/createUsuarioGoogle")
+  async createUsuarioGoogle(
+      @QueryParam("email") email: string,
+      @QueryParam("name") name: string,
+      @QueryParam("picture") picture: string,
+  ) {
+      return this.service.createUsuarioGoogle(email, name, picture);
+  }
+
+  @Get("/takePassword")
+  async takePassword(@QueryParam("email") email: string) {
+    return this.service.takePassword(email)
+  }
+
   @Get("/dataUser")
   async dataUser(@QueryParam("usuario") usuario: string) {
     return this.service.dataUser(usuario)
