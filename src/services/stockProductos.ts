@@ -37,7 +37,7 @@ export default class StockProductosService {
 
     const updateCli = `UPDATE ArticuloManufacturado SET
     denominacion = '${denomi}', precioVenta = ${formData.precioVenta}, descripcion = '${formData.descripcion}', 
-    idRubro = ${formData.rubro}, receta = '${formData.receta}'
+    idRubro = ${formData.rubro}, receta = '${formData.receta}', tiempoEstimadoCocina = ${formData.tiempoEstimadoCocina}
     WHERE idArticuloManufacturado = ${formData.idData}`
     const dataCli = await this.conectionLegacy.query(updateCli);
 
