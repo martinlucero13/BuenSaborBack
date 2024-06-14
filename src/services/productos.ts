@@ -6,6 +6,16 @@ export default class ProductosService {
     this.conectionLegacy = getDBConnection(DatabasesEnum.LEGACY)
   }
 
+  async getUltimoProducto() {
+    const query =  `SELECT idPedido
+    FROM pedido
+    ORDER BY idPedido DESC
+    LIMIT 1;`
+    const data = await this.conectionLegacy.query(query)
+    //console.log(data)
+    return data
+  }
+
   async getProductos() {
     const query = 
     `SELECT a.*, b.denominacion AS nomrub 
@@ -147,10 +157,17 @@ export default class ProductosService {
     const queryUltPed = `SELECT MAX(idPedido) AS idPedido FROM Pedido`;
     let ultPedido = await this.conectionLegacy.query(queryUltPed);
     let pagado:number;
-    if(dataPedido.dataPedido[0].retiro == 2){
-      pagado = 1;
-    }else{
+
+    if(dataPedido.dataPedido[0].formaPago==2){
       pagado = 0;
+
+    }
+    else{
+      if(dataPedido.dataPedido[0].retiro == 2){
+        pagado = 1;
+      }else{
+        pagado = 0;
+      }
     }
     
     try{
@@ -162,7 +179,7 @@ export default class ProductosService {
        //agrege col pagado 0 No 1 SI
       const queryPedido =
       `INSERT INTO Factura (idFactura, numero, montoDescuento, formaPago, nroTarjeta, totalVenta, totalCosto, pagado)
-      VALUES(${ultPedido[0].idPedido},${ultNum}, 0, 1, 0, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].totalNETO}, ${pagado})`
+      VALUES(${ultPedido[0].idPedido},${ultNum}, 0, ${dataPedido.dataPedido[0].formaPago}, 0, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].totalNETO}, ${pagado})`
       const data = await this.conectionLegacy.query(queryPedido)
 
       if (data.affectedRows > 0) {
@@ -182,7 +199,7 @@ export default class ProductosService {
     //agrege col pagado 0 No 1 SI
     //Agregar en la consulta de pedido y de cajero
     const query = 
-    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto,
+    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto, b.pagado,
     b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura

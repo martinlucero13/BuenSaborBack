@@ -8,6 +8,11 @@ export class ProductosController {
     this.service = new ProductosService()
   }
 
+  @Get("/getUltimoProducto")
+  async getUltimoProducto() {
+    return this.service.getUltimoProducto()
+  }
+
   @Get("/getProductos")
   async getProductos() {
     return this.service.getProductos()

@@ -8,6 +8,8 @@ import { StockIngredientesController } from "./stockIngredientes";
 import { StockProductosController } from "./stockProductos";
 import { ProductosController } from "./productos";
 import { EstadisticasController } from "./estadisticas";
+import { ConfiguracionController } from "./configuracion";
+import { MercadoPagoDatosController } from "./mercadoPagoDatos";
 
 export const controllers = [
   UsersColController,
@@ -19,5 +21,7 @@ export const controllers = [
   StockIngredientesController,
   StockProductosController,
   ProductosController,
-  EstadisticasController
+  EstadisticasController,
+  ConfiguracionController,
+  MercadoPagoDatosController
 ];
