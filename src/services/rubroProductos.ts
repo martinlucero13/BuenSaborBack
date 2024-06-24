@@ -10,7 +10,7 @@ export default class RubroProductosService {
 
   async getRubroProductos() {
     const query = 
-    `SELECT * FROM rubro WHERE rubro = 2 AND subrubro != 0`
+    `SELECT * FROM rubro WHERE rubro = 2 AND subrubro != 0 ORDER BY denominacion`
     const data = await this.conectionLegacy.query(query)
     return data
   }
@@ -51,7 +51,8 @@ export default class RubroProductosService {
     idRubro AS id,
     denominacion AS nombre
     FROM rubro 
-    WHERE rubro = 2 AND subrubro != 0 AND habilitado = 1`
+    WHERE rubro = 2 AND subrubro != 0 AND habilitado = 1
+    ORDER BY denominacion`
     const data = await this.conectionLegacy.query(query)
     return data
   }

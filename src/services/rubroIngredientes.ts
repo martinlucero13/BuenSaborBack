@@ -8,7 +8,7 @@ export default class RubroIngredientesService {
 
   async getRubroIngredientes() {
     const query = 
-    `SELECT * FROM rubro WHERE rubro = 1 AND subrubro != 0`
+    `SELECT * FROM rubro WHERE rubro = 1 AND subrubro != 0 ORDER BY denominacion`
     const data = await this.conectionLegacy.query(query)
     return data
   }
