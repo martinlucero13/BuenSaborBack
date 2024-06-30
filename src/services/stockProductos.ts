@@ -12,7 +12,8 @@ export default class StockProductosService {
     const query = `SELECT a.*, b.denominacion AS nomrub 
     FROM ArticuloManufacturado a
     INNER JOIN Rubro b ON a.idRubro = b.idRubro
-    WHERE b.habilitado = 1`;
+    WHERE b.habilitado = 1
+    ORDER BY b.denominacion,  a.denominacion`
 
     const data = await this.conectionLegacy.query(query);
 
@@ -51,8 +52,8 @@ export default class StockProductosService {
     FROM CantidadIngredientes C
     INNER JOIN ArticuloInsumo A ON C.idArticuloInsumo = A.idArticuloInsumo
     INNER JOIN rubro R ON A.idRubro = R.idRubro
-    WHERE idArticuloManufac = ${idArticuloManufacturado}`;
-
+    WHERE idArticuloManufac = ${idArticuloManufacturado}
+    ORDER BY a.denominacion`;
     const data = await this.conectionLegacy.query(query);
     return data;
   }
@@ -96,16 +97,18 @@ export default class StockProductosService {
     FROM ArticuloInsumo a
     INNER JOIN rubro r ON a.idRubro = r.idRubro 
     WHERE a.esInsumo = 1 
-    AND r.idRubro = ${rubro}`;
+    AND r.idRubro = ${rubro}
+    ORDER BY a.denominacion`
 
     const data = await this.conectionLegacy.query(query);
     return data;
   }
 
   async getRubrosIngredientes() {
-    const query = `SELECT * FROM rubro WHERE rubro = 1 AND subrubro != 0`;
-    const data = await this.conectionLegacy.query(query);
-    return data;
+    const query = 
+    `SELECT * FROM rubro WHERE rubro = 1 AND subrubro != 0 ORDER BY denominacion`
+    const data = await this.conectionLegacy.query(query) 
+    return data
   }
 
   async createIngredientesProductos(formData: any) {

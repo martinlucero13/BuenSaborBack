@@ -12,7 +12,8 @@ export default class StockIngredientesService {
     r.idRubro, r.rubro, r.subrubro, r.denominacion, r.habilitado
     FROM ArticuloInsumo a
     INNER JOIN rubro r ON a.idRubro = r.idRubro 
-    WHERE a.esInsumo = 1 AND r.habilitado = 1`
+    WHERE a.esInsumo = 1 AND r.habilitado = 1
+    ORDER BY r.denominacion, a.denominacion`
 
     const data = await this.conectionLegacy.query(query)
     return data

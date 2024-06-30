@@ -21,7 +21,8 @@ export default class ProductosService {
     `SELECT a.*, b.denominacion AS nomrub 
     FROM ArticuloManufacturado a
     INNER JOIN Rubro b ON a.idRubro = b.idRubro
-    WHERE b.habilitado = 1`
+    WHERE b.habilitado = 1
+    ORDER BY a.denominacion`
 
     const data = await this.conectionLegacy.query(query)
     //console.log(data)
@@ -33,7 +34,8 @@ export default class ProductosService {
     `SELECT a.*, b.denominacion AS nomrub 
     FROM ArticuloManufacturado a
     INNER JOIN Rubro b ON a.idRubro = b.idRubro
-    WHERE b.habilitado = 1 and b.idRubro = ${marca}`
+    WHERE b.habilitado = 1 and b.idRubro = ${marca}
+    ORDER BY a.denominacion`
 
     const data = await this.conectionLegacy.query(query)
     return data
