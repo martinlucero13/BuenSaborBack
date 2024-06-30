@@ -99,8 +99,8 @@ export default class ProductosService {
       await this.conectionLegacy.query('START TRANSACTION');
 
       const queryPedido =
-      `INSERT INTO Pedido (fecha, numero, estado, horaEstimadaFin, tipoEnvio, total, idCliente)
-      VALUES('${fecha_formateada}', ${ultNum}, 0, '${horaEstimadaFin}', ${dataPedido.dataPedido[0].retiro}, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].legajo})`
+      `INSERT INTO Pedido (fecha, numero, estado, horaEstimadaFin, tipoEnvio, total, idCliente,idDomicilio)
+      VALUES('${fecha_formateada}', ${ultNum}, 0, '${horaEstimadaFin}', ${dataPedido.dataPedido[0].retiro}, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].legajo}, ${dataPedido.dataPedido[0].domicilio})`
       const data = await this.conectionLegacy.query(queryPedido)
 
       if (data.affectedRows > 0) {
@@ -113,7 +113,7 @@ export default class ProductosService {
         for(let i=0; i<dataPedido.dataPedido.length; i++){
 
             const queryDetalle = `INSERT INTO DetallePedido (cantidad, subtotal, idPedido, idArticuloManufacturado)
-            VALUES (${dataPedido.dataPedido[i].cantidad}, ${dataPedido.dataPedido[i].precio}, ${ultidPedido}, ${dataPedido.dataPedido[i].idArticuloManufacturado})`
+            VALUES (${dataPedido.dataPedido[i].cantidad}, ${dataPedido.dataPedido[0].subtotal}, ${ultidPedido}, ${dataPedido.dataPedido[i].idArticuloManufacturado})`
             const dataDetalle = await this.conectionLegacy.query(queryDetalle);
             // Verificar si la inserción fue exitosa
             if (dataDetalle.affectedRows > 0) {
@@ -179,7 +179,7 @@ export default class ProductosService {
        //agrege col pagado 0 No 1 SI
       const queryPedido =
       `INSERT INTO Factura (idFactura, numero, montoDescuento, formaPago, nroTarjeta, totalVenta, totalCosto, pagado)
-      VALUES(${ultPedido[0].idPedido},${ultNum}, 0, ${dataPedido.dataPedido[0].formaPago}, 0, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].totalNETO}, ${pagado})`
+      VALUES(${ultPedido[0].idPedido},${ultNum}, ${dataPedido.dataPedido[0].descuento}, ${dataPedido.dataPedido[0].formaPago}, 0, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].totalNETO}, ${pagado})`
       const data = await this.conectionLegacy.query(queryPedido)
 
       if (data.affectedRows > 0) {
@@ -199,7 +199,7 @@ export default class ProductosService {
     //agrege col pagado 0 No 1 SI
     //Agregar en la consulta de pedido y de cajero
     const query = 
-    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto, b.pagado,
+    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto, b.pagado, b.montoDescuento,
     b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura
@@ -377,4 +377,6 @@ export default class ProductosService {
     //console.log(data)
     return data
   }
+
+
 }

@@ -65,6 +65,25 @@ export default class ClientesService {
     return dataUsu
   }
 
+  async editDomicilio(formData: any) {
+    const updateDom = `UPDATE Domicilio SET 
+    calle = '${formData.calle}', numero = '${formData.numero}', localidad = '${formData.localidad}' WHERE idDomicilio = ${formData.idData}`
+    const dataDom = await this.conectionLegacy.query(updateDom);
+    return dataDom
+  }
+
+
+  
+  async getDomicilio(idUsuario: number) {
+    const query = 
+    `SELECT 
+    *
+    FROM Domicilio WHERE idDomicilio = ${idUsuario}`;//Esto para buscar clientes'1'
+
+    const data = await this.conectionLegacy.query(query)
+    return data
+  }
+
     async deleteCliente(idUsuario: number) {
     const deleteUsu = `DELETE from usuario WHERE idUsuario = ${idUsuario}`
     const dataUsu = await this.conectionLegacy.query(deleteUsu);

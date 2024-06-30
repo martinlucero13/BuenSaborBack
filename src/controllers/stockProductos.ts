@@ -51,6 +51,13 @@ export class StockProductosController {
     return this.service.getRubrosIngredientes()
   }
 
+  @Get("/getCantidadDisponibleProducto")
+  async getCantidadDisponibleProducto(
+      @QueryParam("idArticuloManufacturado") idArticuloManufacturado: string
+  ) {
+      return this.service.getCantidadDisponibleProducto(idArticuloManufacturado);
+  }
+
   @Post("/createIngredientesProductos")
   async createIngredientesProductos(
       @Body() formData: any

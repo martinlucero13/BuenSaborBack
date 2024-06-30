@@ -40,4 +40,18 @@ export class ClientesController {
   ) {
     return this.service.getPerfil(idUsuario)
   }
+
+  @Get("/getDomicilio")
+  async getDomicilio(
+    @QueryParam("idUsuario") idUsuario: number
+  ) {
+    return this.service.getDomicilio(idUsuario);
+  }
+
+  @Post("/editDomicilio")
+  async editDomicilio(
+      @Body() formData: any
+  ) {
+      return this.service.editDomicilio(formData);
+  }
 }
