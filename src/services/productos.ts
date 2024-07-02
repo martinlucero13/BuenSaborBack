@@ -1,47 +1,50 @@
-import { getDBConnection, DatabasesEnum } from "../database/connectionManager"
+import { getDBConnection, DatabasesEnum } from "../database/connectionManager";
 
 export default class ProductosService {
-  private conectionLegacy
+  private conectionLegacy;
   constructor() {
-    this.conectionLegacy = getDBConnection(DatabasesEnum.LEGACY)
+    this.conectionLegacy = getDBConnection(DatabasesEnum.LEGACY);
   }
 
   async getUltimoProducto() {
-    const query =  `SELECT idPedido
+    const query = `SELECT idPedido
     FROM pedido
     ORDER BY idPedido DESC
-    LIMIT 1;`
-    const data = await this.conectionLegacy.query(query)
+    LIMIT 1;`;
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
   async getProductos() {
-    const query = 
-    `SELECT a.*, b.denominacion AS nomrub 
+    const query = `SELECT a.*, b.denominacion AS nomrub 
     FROM ArticuloManufacturado a
     INNER JOIN Rubro b ON a.idRubro = b.idRubro
     WHERE b.habilitado = 1
-    ORDER BY a.denominacion`
+    ORDER BY a.denominacion`;
 
-    const data = await this.conectionLegacy.query(query)
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
-  async getProductosPorMarca(marca :string) {
-    const query = 
-    `SELECT a.*, b.denominacion AS nomrub 
+  async getProductosPorMarca(marca: string) {
+    const query = `SELECT a.*, b.denominacion AS nomrub 
     FROM ArticuloManufacturado a
     INNER JOIN Rubro b ON a.idRubro = b.idRubro
     WHERE b.habilitado = 1 and b.idRubro = ${marca}
-    ORDER BY a.denominacion`
+    ORDER BY a.denominacion`;
 
-    const data = await this.conectionLegacy.query(query)
-    return data
+    const data = await this.conectionLegacy.query(query);
+    return data;
   }
 
-  sumarMinutosAHora(horas: number,minutos: number,segundos: number,tiempoTotal: number): string {
+  sumarMinutosAHora(
+    horas: number,
+    minutos: number,
+    segundos: number,
+    tiempoTotal: number
+  ): string {
     // Convertir todo a minutos
     let totalMinutos = horas * 60 + minutos + tiempoTotal;
 
@@ -50,16 +53,17 @@ export default class ProductosService {
     const nuevoMinuto = totalMinutos % 60;
 
     // Formatear la nueva hora
-    const nuevaHoraStr = (nuevaHora < 10 ? '0' : '') + nuevaHora.toString();
-    const nuevoMinutoStr = (nuevoMinuto < 10 ? '0' : '') + nuevoMinuto.toString();
+    const nuevaHoraStr = (nuevaHora < 10 ? "0" : "") + nuevaHora.toString();
+    const nuevoMinutoStr =
+      (nuevoMinuto < 10 ? "0" : "") + nuevoMinuto.toString();
 
     // Componer la nueva hora
     return `${nuevaHoraStr}:${nuevoMinutoStr}:${segundos}`;
-}
+  }
 
   async savePedido(dataPedido: any) {
-    //Para guardar el pedido primero guardo en la tabla pedido y hago un bucle por cada articulo, 
-    //los cuales voy guardando en el detalle los 
+    //Para guardar el pedido primero guardo en la tabla pedido y hago un bucle por cada articulo,
+    //los cuales voy guardando en el detalle los
     //ESTADOS son 0 apenas ingresa en pendiente de confirmacion
     //1 En confirmado/cocina/preparacion
     //2 Finalizado
@@ -72,18 +76,18 @@ export default class ProductosService {
     const queryultNum = `SELECT MAX(numero) AS numero FROM Pedido`;
     let ultNumero = await this.conectionLegacy.query(queryultNum);
     let ultNum: number = ultNumero[0].numero;
-    ultNum ++;
+    ultNum++;
 
     let fecha_str = dataPedido.dataPedido[0].fecha;
     let dia = fecha_str.substr(0, 2);
     let mes = fecha_str.substr(2, 2);
     let ano = fecha_str.substr(4, 4);
-    let fecha_formateada = ano + '-' + mes + '-' + dia;
+    let fecha_formateada = ano + "-" + mes + "-" + dia;
 
-    let tiempoTotal =0;
-    for(let i=0; i<dataPedido.dataPedido.length; i++){
-      tiempoTotal = tiempoTotal + dataPedido.dataPedido[i].tiempoEstimadoCocina
-      //tiempoTotal = tiempoTotal + (dataPedido.dataPedido[i].tiempoEstimadoCocina * dataPedido.dataPedido[i].cantidad) 
+    let tiempoTotal = 0;
+    for (let i = 0; i < dataPedido.dataPedido.length; i++) {
+      tiempoTotal = tiempoTotal + dataPedido.dataPedido[i].tiempoEstimadoCocina;
+      //tiempoTotal = tiempoTotal + (dataPedido.dataPedido[i].tiempoEstimadoCocina * dataPedido.dataPedido[i].cantidad)
       //Esta podria ser una opcion
       //mas para sacar el tiempo, pero se supone que cuenden prepara varias al mismo tiempo, pero tambien lo podemos tener en cuenta
       //Solo que el tiempo total final se puede ir muy alto si los tiempos son de muchos min y la cantidad es mucha
@@ -93,105 +97,128 @@ export default class ProductosService {
     let horas = parseInt(hora_str.substr(0, 2));
     let minutos = parseInt(hora_str.substr(2, 2));
     let segundos = parseInt(hora_str.substr(4, 2));
-    let horaEstimadaFin = this.sumarMinutosAHora(horas,minutos,segundos,tiempoTotal);
+    let horaEstimadaFin = this.sumarMinutosAHora(
+      horas,
+      minutos,
+      segundos,
+      tiempoTotal
+    );
 
     //console.log(fecha_formateada, ultNum, horaEstimadaFin);
-    try{
+    try {
       // Iniciar transacción
-      await this.conectionLegacy.query('START TRANSACTION');
+      await this.conectionLegacy.query("START TRANSACTION");
 
-      const queryPedido =
-      `INSERT INTO Pedido (fecha, numero, estado, horaEstimadaFin, tipoEnvio, total, idCliente,idDomicilio)
-      VALUES('${fecha_formateada}', ${ultNum}, 0, '${horaEstimadaFin}', ${dataPedido.dataPedido[0].retiro}, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].legajo}, ${dataPedido.dataPedido[0].domicilio})`
-      const data = await this.conectionLegacy.query(queryPedido)
+      const queryPedido = `INSERT INTO Pedido (fecha, numero, estado, horaEstimadaFin, tipoEnvio, total, idCliente)
+      VALUES('${fecha_formateada}', ${ultNum}, 0, '${horaEstimadaFin}', ${dataPedido.dataPedido[0].retiro}, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].legajo})`;
+      const data = await this.conectionLegacy.query(queryPedido);
 
       if (data.affectedRows > 0) {
         //console.log("Inserto la cabecera correctamente")
-        const queryUltPed = `SELECT MAX(idPedido) AS id FROM Pedido`
+        const queryUltPed = `SELECT MAX(idPedido) AS id FROM Pedido`;
         let ultPedido = await this.conectionLegacy.query(queryUltPed);
         let ultidPedido: number = ultPedido[0].id;
         let correctos: number = 0;
 
-        for(let i=0; i<dataPedido.dataPedido.length; i++){
+        if (dataPedido.dataPedido[0].formaPago == 2 && dataPedido.dataPedido[0].retiro==2) {
+          let domicilioPedido = await this.saveDomicilioPedido(
+            dataPedido,
+            ultidPedido
+          );
+          if (domicilioPedido === 0) {
+            await this.conectionLegacy.query("ROLLBACK");
+            return 0;
+          }
+        }
 
-            const queryDetalle = `INSERT INTO DetallePedido (cantidad, subtotal, idPedido, idArticuloManufacturado)
-            VALUES (${dataPedido.dataPedido[i].cantidad}, ${dataPedido.dataPedido[0].subtotal}, ${ultidPedido}, ${dataPedido.dataPedido[i].idArticuloManufacturado})`
-            const dataDetalle = await this.conectionLegacy.query(queryDetalle);
-            // Verificar si la inserción fue exitosa
-            if (dataDetalle.affectedRows > 0) {
-              correctos++;
+        for (let i = 0; i < dataPedido.dataPedido.length; i++) {
+          const queryDetalle = `INSERT INTO DetallePedido (cantidad, subtotal, idPedido, idArticuloManufacturado)
+            VALUES (${dataPedido.dataPedido[i].cantidad}, ${dataPedido.dataPedido[0].subtotal}, ${ultidPedido}, ${dataPedido.dataPedido[i].idArticuloManufacturado})`;
+          const dataDetalle = await this.conectionLegacy.query(queryDetalle);
+          // Verificar si la inserción fue exitosa
+          if (dataDetalle.affectedRows > 0) {
+            correctos++;
           }
         }
         // Verificar si todas las inserciones en DetallePedido fueron exitosas
         if (correctos === dataPedido.dataPedido.length) {
           // Si todas las inserciones fueron exitosas, hacer commit
-          let factura = await this.saveFactura(dataPedido)
-          if(factura === 1){
-            await this.conectionLegacy.query('COMMIT');
+          let factura = await this.saveFactura(dataPedido);
+          if (factura === 1) {
+            await this.conectionLegacy.query("COMMIT");
             return 1;
-          }
-          else{
-            await this.conectionLegacy.query('ROLLBACK');
+          } else {
+            await this.conectionLegacy.query("ROLLBACK");
             return 0;
           }
         } else {
           // Si alguna inserción falló, hacer rollback
-          await this.conectionLegacy.query('ROLLBACK');
+          await this.conectionLegacy.query("ROLLBACK");
           return 0;
         }
       } else {
         // Si la inserción en Pedido falló, hacer rollback
-        await this.conectionLegacy.query('ROLLBACK');
+        await this.conectionLegacy.query("ROLLBACK");
         return 0;
       }
-    }catch(error){
+    } catch (error) {
       console.error(error);
       return 0;
     }
   }
-//La table detalle factura no fue necesario utilizarla porque todo queda guardado en la tabla detalle pedido 
+
+  async saveDomicilioPedido(dataPedido: any, ultPedido: any) {
+    console.log(dataPedido);
+    const queryDomicilio = `INSERT INTO DomicilioPedido (idPedido, calle, numero, localidad)
+            VALUES (${ultPedido}, '${dataPedido.dataPedido[0].calle}', ${dataPedido.dataPedido[0].numero}, '${dataPedido.dataPedido[0].localidad}')`;
+    //console.log(queryDomicilio);
+    const data = await this.conectionLegacy.query(queryDomicilio);
+
+    if (data.affectedRows > 0) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+  //La table detalle factura no fue necesario utilizarla porque todo queda guardado en la tabla detalle pedido
   async saveFactura(dataPedido: any) {
     const queryultNum = `SELECT MAX(numero) AS numero FROM Factura`;
     let ultNumero = await this.conectionLegacy.query(queryultNum);
     let ultNum: number = ultNumero[0].numero;
-    ultNum ++;
+    ultNum++;
 
     const queryUltPed = `SELECT MAX(idPedido) AS idPedido FROM Pedido`;
     let ultPedido = await this.conectionLegacy.query(queryUltPed);
-    let pagado:number;
+    let pagado: number;
 
-    if(dataPedido.dataPedido[0].formaPago==2){
+    if (dataPedido.dataPedido[0].formaPago == 2) {
       pagado = 0;
-
-    }
-    else{
-      if(dataPedido.dataPedido[0].retiro == 2){
+    } else {
+      if (dataPedido.dataPedido[0].retiro == 2) {
         pagado = 1;
-      }else{
+      } else {
         pagado = 0;
       }
     }
-    
-    try{
-      
-      await this.conectionLegacy.query('START TRANSACTION');
+
+    try {
+      await this.conectionLegacy.query("START TRANSACTION");
       //Tengo que programar la forma de pago para guradarla 1 Efectivo 2 MercadoPago
       //Programar como obtener el nro de tarjeta
       //Programar el total del costo??
-       //agrege col pagado 0 No 1 SI
-      const queryPedido =
-      `INSERT INTO Factura (idFactura, numero, montoDescuento, formaPago, nroTarjeta, totalVenta, totalCosto, pagado)
-      VALUES(${ultPedido[0].idPedido},${ultNum}, ${dataPedido.dataPedido[0].descuento}, ${dataPedido.dataPedido[0].formaPago}, 0, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].totalNETO}, ${pagado})`
-      const data = await this.conectionLegacy.query(queryPedido)
+      //agrege col pagado 0 No 1 SI
+      const queryPedido = `INSERT INTO Factura (idFactura, numero, montoDescuento, formaPago, nroTarjeta, totalVenta, totalCosto, pagado)
+      VALUES(${ultPedido[0].idPedido},${ultNum}, ${dataPedido.dataPedido[0].descuento}, ${dataPedido.dataPedido[0].formaPago}, 0, ${dataPedido.dataPedido[0].totalNETO}, ${dataPedido.dataPedido[0].totalNETO}, ${pagado})`;
+      const data = await this.conectionLegacy.query(queryPedido);
 
       if (data.affectedRows > 0) {
-        await this.conectionLegacy.query('COMMIT');
+        await this.conectionLegacy.query("COMMIT");
         return 1;
       } else {
-        await this.conectionLegacy.query('ROLLBACK');
+        await this.conectionLegacy.query("ROLLBACK");
         return 0;
       }
-    }catch(error){
+    } catch (error) {
       console.error(error);
       return 0;
     }
@@ -200,18 +227,17 @@ export default class ProductosService {
   async tomarPedido(NROLEG: string) {
     //agrege col pagado 0 No 1 SI
     //Agregar en la consulta de pedido y de cajero
-    const query = 
-    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto, b.pagado, b.montoDescuento,
+    const query = `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto, b.pagado, b.montoDescuento,
     b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura
     INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
     INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
     WHERE idCliente =  ${NROLEG}
-    `
-    const data = await this.conectionLegacy.query(query)
+    `;
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
   async cancelarPedido(NROLEG: string, idPedido: string) {
@@ -219,59 +245,56 @@ export default class ProductosService {
     set estado = 3
     where 
     idPedido=${idPedido} 
-    and idCliente='${NROLEG}'`
+    and idCliente='${NROLEG}'`;
     const data = await this.conectionLegacy.query(query);
-    return data
+    return data;
   }
 
   async tomarPedidoCajero(dateDesde: string, dateHasta: string) {
     //agrege col pagado 0 No 1 SI
     //Agregar en la consulta de pedido y de cajero
     //console.log(dateDesde, dateHasta)
-    const query = 
-    `SELECT *, b.numero AS nrofac
+    const query = `SELECT *, b.numero AS nrofac
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura
     INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
     INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
-    WHERE a.fecha >= '${dateDesde}' and a.fecha <= '${dateHasta}'`
-    const data = await this.conectionLegacy.query(query)
+    WHERE a.fecha >= '${dateDesde}' and a.fecha <= '${dateHasta}'`;
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
   async pedidoPagado(idPedido: string) {
     const query = `update Factura
     set pagado = 1
     where 
-    idFactura=${idPedido}`
+    idFactura=${idPedido}`;
     const data = await this.conectionLegacy.query(query);
-    return data
+    return data;
   }
 
   async tomarPedidoDelivery(dateDesde: string, dateHasta: string) {
-    const query = 
-    `SELECT *, b.numero AS nrofac, f.numero as nrocalle
+    const query = `SELECT *, b.numero AS nrofac, f.calle as calle, f.numero as nrocalle, f.localidad as localidad
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura
     INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
     INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
     INNER JOIN Cliente e ON a.idCliente = e.idCliente
-    INNER JOIN Domicilio f ON a.idCliente = f.idDomicilio
+    LEFT  JOIN DomicilioPedido f ON a.idPedido = f.idPedido
     WHERE a.fecha >= '${dateDesde}' AND a.fecha <= '${dateHasta}'
-    AND a.tipoEnvio = 2`
-    const data = await this.conectionLegacy.query(query)
-    //console.log(data)
-    return data
+    AND a.tipoEnvio = 2 AND a.estado = 2 AND b.pagado = 1`;
+    const data = await this.conectionLegacy.query(query);
+    return data;
   }
 
   async pedidoEntregado(idPedido: string) {
     const query = `update Pedido
     set estado = 4
     where 
-    idPedido=${idPedido}`
+    idPedido=${idPedido}`;
     const data = await this.conectionLegacy.query(query);
-    return data
+    return data;
   }
 
   async tomarPedidoCocina() {
@@ -282,36 +305,33 @@ export default class ProductosService {
     //--INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
     //--INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
 
-    const query = 
-    `SELECT a.idPedido, a.fecha, a.horaEstimadaFin, a.estado
+    const query = `SELECT a.idPedido, a.fecha, a.horaEstimadaFin, a.estado
     FROM Pedido a
     WHERE a.estado < 2
-    ORDER BY a.idPedido DESC`
-    const data = await this.conectionLegacy.query(query)
+    ORDER BY a.idPedido DESC`;
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
   async tomarDetallePedidoCocina(idPedido: string) {
-    const query = 
-    `SELECT *
+    const query = `SELECT *
     FROM DetallePedido a
     INNER JOIN ArticuloManufacturado b on a.idArticuloManufacturado = b.idArticuloManufacturado
-    WHERE idPedido = ${idPedido}`
-    const data = await this.conectionLegacy.query(query)
+    WHERE idPedido = ${idPedido}`;
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
   async tomarIngredientesPedido(idArticuloManufacturado: string) {
-    const query = 
-    `SELECT a.cantidad, b.denominacion, b.unidadMedida
+    const query = `SELECT a.cantidad, b.denominacion, b.unidadMedida
     FROM CantidadIngredientes a
     INNER JOIN ArticuloInsumo b ON a.idArticuloInsumo = b.idArticuloInsumo
-    WHERE a.idArticuloManufac = ${idArticuloManufacturado}`
-    const data = await this.conectionLegacy.query(query)
+    WHERE a.idArticuloManufac = ${idArticuloManufacturado}`;
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
 
   async agregarTiempo(idPedido: string, horaEstimadaFin: string) {
@@ -320,65 +340,59 @@ export default class ProductosService {
     let minutos = parseInt(hora_str.substr(3, 2));
     let segundos = parseInt(hora_str.substr(6, 2));
     //console.log(horas,minutos,segundos)
-    horaEstimadaFin = this.sumarMinutosAHora(horas,minutos,segundos,10);
+    horaEstimadaFin = this.sumarMinutosAHora(horas, minutos, segundos, 10);
     //console.log(idPedido, horaEstimadaFin)
-    const query = 
-    `UPDATE Pedido SET horaEstimadaFin = '${horaEstimadaFin}' WHERE idPedido = ${idPedido}`
-    const data = await this.conectionLegacy.query(query)
-    return data
+    const query = `UPDATE Pedido SET horaEstimadaFin = '${horaEstimadaFin}' WHERE idPedido = ${idPedido}`;
+    const data = await this.conectionLegacy.query(query);
+    return data;
   }
 
   async cambiarEstado(idPedido: string, estado: number) {
-    //Quiero hacer un condicional en el que si el estado despues de ser sumado es 1 se haga el update 
-    //Pero si el estado es 2 es decir que va a ser finalizado se reste el stock de ingredientes 
+    //Quiero hacer un condicional en el que si el estado despues de ser sumado es 1 se haga el update
+    //Pero si el estado es 2 es decir que va a ser finalizado se reste el stock de ingredientes
     let est = estado + 1;
 
-    if(est == 2){
+    if (est == 2) {
       this.restaStokIngrediente(idPedido);
     }
-    const query = 
-    `UPDATE Pedido SET estado = ${est} WHERE idPedido = ${idPedido}`
-    const data = await this.conectionLegacy.query(query)
-    return data
+    const query = `UPDATE Pedido SET estado = ${est} WHERE idPedido = ${idPedido}`;
+    const data = await this.conectionLegacy.query(query);
+    return data;
   }
 
   async restaStokIngrediente(idPedido: string) {
-    const query = 
-    `SELECT b.cantidad AS cantArti, d.cantidad AS cantIngre, d.idArticuloInsumo, (b.cantidad * d.cantidad) AS totResta
+    const query = `SELECT b.cantidad AS cantArti, d.cantidad AS cantIngre, d.idArticuloInsumo, (b.cantidad * d.cantidad) AS totResta
     FROM Pedido a
     INNER JOIN DetallePedido b ON a.idPedido = b.idPedido
     INNER JOIN ArticuloManufacturado c ON b.idArticuloManufacturado = c.idArticuloManufacturado
     INNER JOIN CantidadIngredientes d ON c.idArticuloManufacturado = d.idArticuloManufac
-    WHERE a.idPedido = ${idPedido}`
+    WHERE a.idPedido = ${idPedido}`;
     const data = await this.conectionLegacy.query(query);
 
-    for(let i=0; i<data.length; i++){
-      const queryStock = `SELECT stockActual FROM ArticuloInsumo WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`
+    for (let i = 0; i < data.length; i++) {
+      const queryStock = `SELECT stockActual FROM ArticuloInsumo WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`;
       const dataStock = await this.conectionLegacy.query(queryStock);
       let stockActual = dataStock[0].stockActual;
       let totalARestar = data[i].totResta;
       let nuevoStock = stockActual - totalARestar;
 
-      const queryNuevoStock = `UPDATE ArticuloInsumo SET stockActual = ${nuevoStock} WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`
+      const queryNuevoStock = `UPDATE ArticuloInsumo SET stockActual = ${nuevoStock} WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`;
       const dataNuevoStock = await this.conectionLegacy.query(queryNuevoStock);
-    }   
+    }
   }
 
   async tomarPedidoAdmin(dateDesde: string, dateHasta: string) {
-    const query = 
-    `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto,
+    const query = `SELECT a.idPedido, b.numero AS nrofac, a.fecha, a.horaEstimadaFin, a.tipoEnvio, b.totalCosto,
     b.formaPago, a.estado, d.imagen, d.denominacion, c.cantidad, d.precioVenta 
     FROM Pedido a
     INNER JOIN Factura b ON a.idPedido = b.idFactura
     INNER JOIN DetallePedido c ON a.idPedido = c.idPedido
     INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
     WHERE a.fecha >= '${dateDesde}' AND a.fecha <= '${dateHasta}'
-    AND (a.estado = 2 OR a.estado = 4)`
+    AND (a.estado = 2 OR a.estado = 4)`;
 
-    const data = await this.conectionLegacy.query(query)
+    const data = await this.conectionLegacy.query(query);
     //console.log(data)
-    return data
+    return data;
   }
-
-
 }

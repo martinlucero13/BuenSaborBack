@@ -71,23 +71,19 @@ export default class StockProductosService {
     for (const cantidadIngrediente of listaCantidadIngredientes) {
       let stockActual: number = Number(cantidadIngrediente["stockActual"]);
       let cantidad: number = Number(cantidadIngrediente["cantidad"]);
-      console.log(stockActual + "-" + cantidad);
 
       if (stockActual > cantidad) {
         let cantidadAux: number = Math.floor(stockActual / cantidad);
 
-        console.log(cantidadAux);
 
         if (cantidadAux < cantidadDisponible) {
           cantidadDisponible = cantidadAux;
         }
       } else {
-        console.log("No hay Stock");
         cantidadDisponible = 0;
         break;
       }
     };
-    console.log(cantidadDisponible);
     return {cantidadDisponible};
     
   }
