@@ -99,8 +99,8 @@ export class ProductosController {
 
   @Post("/cambiarEstado")
   async cambiarEstado(
-    @QueryParam("idPedido", { required: true }) idPedido: string,
-    @QueryParam("estado", { required: true }) estado: number
+    @QueryParam("idPedido") idPedido: string,
+    @QueryParam("estado") estado: number
   ) {
       return this.service.cambiarEstado(idPedido, estado);
   }
