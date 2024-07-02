@@ -347,7 +347,7 @@ export default class ProductosService {
   }
 
   async cambiarEstado(idPedido: string, estado: number) {
-    console.log(idPedido, estado)
+    console.log("Cambio de estado",idPedido, estado)
     //Quiero hacer un condicional en el que si el estado despues de ser sumado es 1 se haga el update
     //Pero si el estado es 2 es decir que va a ser finalizado se reste el stock de ingredientes
     let est = estado + 1;
