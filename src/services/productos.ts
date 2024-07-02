@@ -282,8 +282,7 @@ export default class ProductosService {
     INNER JOIN ArticuloManufacturado d ON c.idArticuloManufacturado = d.idArticuloManufacturado
     INNER JOIN Cliente e ON a.idCliente = e.idCliente
     LEFT  JOIN DomicilioPedido f ON a.idPedido = f.idPedido
-    WHERE a.fecha >= '${dateDesde}' AND a.fecha <= '${dateHasta}'
-    AND a.tipoEnvio = 2 AND a.estado = 2 AND b.pagado = 1`;
+    WHERE a.tipoEnvio = 2 AND a.estado = 2 AND b.pagado = 1`;
     const data = await this.conectionLegacy.query(query);
     return data;
   }
@@ -307,8 +306,8 @@ export default class ProductosService {
 
     const query = `SELECT a.idPedido, a.fecha, a.horaEstimadaFin, a.estado
     FROM Pedido a
-    WHERE a.estado < 2
-    ORDER BY a.idPedido DESC`;
+    WHERE a.estado = 1
+    ORDER BY a.idPedido DESC`
     const data = await this.conectionLegacy.query(query);
     //console.log(data)
     return data;

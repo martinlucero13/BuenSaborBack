@@ -59,8 +59,8 @@ export class ProductosController {
 
   @Get("/tomarPedidoDelivery")
   async tomarPedidoDelivery(
-    @QueryParam("dateDesde", { required: true }) dateDesde: string,
-    @QueryParam("dateHasta", { required: true }) dateHasta: string,
+    @QueryParam("dateDesde") dateDesde: string,
+    @QueryParam("dateHasta") dateHasta: string,
   ) {
       return this.service.tomarPedidoDelivery(dateDesde,dateHasta);
   }
