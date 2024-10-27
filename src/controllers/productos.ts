@@ -105,6 +105,13 @@ export class ProductosController {
       return this.service.cambiarEstado(idPedido, estado);
   }
 
+  @Post("/sumarStokIngredienteCancelado")
+  async sumarStokIngredienteCancelado(
+    @QueryParam("idPedido", { required: true }) idPedido: string,
+  ) {
+      return this.service.sumarStokIngredienteCancelado(idPedido);
+  }
+
   @Get("/tomarPedidoAdmin")
   async tomarPedidoAdmin(
     @QueryParam("dateDesde", { required: true }) dateDesde: string,

@@ -352,7 +352,7 @@ export default class ProductosService {
     //Pero si el estado es 2 es decir que va a ser finalizado se reste el stock de ingredientes
     let est = estado + 1;
 
-    if (est == 2) {
+    if (est == 1) {
       this.restaStokIngrediente(idPedido);
     }
     const query = `UPDATE Pedido SET estado = ${est} WHERE idPedido = ${idPedido}`;
@@ -379,6 +379,29 @@ export default class ProductosService {
       const queryNuevoStock = `UPDATE ArticuloInsumo SET stockActual = ${nuevoStock} WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`;
       const dataNuevoStock = await this.conectionLegacy.query(queryNuevoStock);
     }
+  }
+
+  async sumarStokIngredienteCancelado(idPedido: string) {
+    const query = `SELECT b.cantidad AS cantArti, d.cantidad AS cantIngre, d.idArticuloInsumo, (b.cantidad * d.cantidad) AS totResta
+    FROM Pedido a
+    INNER JOIN DetallePedido b ON a.idPedido = b.idPedido
+    INNER JOIN ArticuloManufacturado c ON b.idArticuloManufacturado = c.idArticuloManufacturado
+    INNER JOIN CantidadIngredientes d ON c.idArticuloManufacturado = d.idArticuloManufac
+    WHERE a.idPedido = ${idPedido}`;
+    const data = await this.conectionLegacy.query(query);
+
+    for (let i = 0; i < data.length; i++) {
+      const queryStock = `SELECT stockActual FROM ArticuloInsumo WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`;
+      const dataStock = await this.conectionLegacy.query(queryStock);
+      let stockActual = dataStock[0].stockActual;
+      let totalARestar = data[i].totResta;
+      let nuevoStock = stockActual + totalARestar;
+
+      const queryNuevoStock = `UPDATE ArticuloInsumo SET stockActual = ${nuevoStock} WHERE idArticuloInsumo = ${data[i].idArticuloInsumo}`;
+      const dataNuevoStock = await this.conectionLegacy.query(queryNuevoStock);
+    }
+    const queryCancela = `UPDATE Pedido SET estado = 3 WHERE idPedido = ${idPedido}`;
+    const dataCancela = await this.conectionLegacy.query(queryCancela);
   }
 
   async tomarPedidoAdmin(dateDesde: string, dateHasta: string) {
